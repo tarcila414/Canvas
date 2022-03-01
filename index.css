@@ -1,0 +1,25 @@
+body {
+    height: 95vh;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.MainContainer {
+    border: 1px solid red;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+#user-options-area {
+    border: 1px solid black;
+    width: 100%;
+    padding: 1rem;
+}
+
+#canvas-area {
+    border: 1px solid blue;
+    padding: 0rem 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
