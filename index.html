@@ -12,47 +12,89 @@
 <body onload="initCanvas(), getPointPosition()">
     <div class="MainContainer">
         <div id="canvas-area">
-            <canvas id="canvas" width="1000" height="500" style="border: 1px solid black"></canvas>
+            <canvas id="canvas" width="850" height="500" style="border: 1px solid black"></canvas>
         </div>
         <div id="user-options-area">
-            <h2>Ações</h2>
             <div>
                 <h3>Desenhar</h3>
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div id="bntDesenhar">
+                  <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       RETA
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                       <a class="dropdown-item" onclick="setActionFlag('drawLine'),setAlgorithmFlag('DDA')">DDA</a>
                       <a class="dropdown-item" onclick="setActionFlag('drawLine'),setAlgorithmFlag('BRESENHAM')">BRESENHAM</a>
                     </div>
+                </div>
+                <div class="dropdown">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    POLÍGONO
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" onclick="setActionFlag('drawPolygon')">Escolher vértices</a>
+                    <a class="dropdown-item" onclick="submitVertices()">Traçar arestas</a>
                   </div>
-                <button class="btn btn-secondary" type="button" onClick="setActionFlag('drawPolygon')">Polígono</button>
-                <button class="btn btn-secondary" type="button" onClick="setActionFlag('drawCircumference')">Circunferência</button>
-            </div>
-            <div>
+                </div>
+                <button class="btn btn-primary" type="button" onClick="setActionFlag('drawCircumference')">CIRCUNFERÊNCIA</button>
+                </div>
                 
-
+            </div>
+            <div id="div-transformar">
                 <h3>Transformar</h3>
                 <div>
                     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                         <li class="nav-item">
-                          <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Home</a>
+                          <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Transladar</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</a>
+                          <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Rotacionar</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
+                          <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Escalar</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="pills-ref-tab" data-toggle="pill" href="#pills-ref" role="tab" aria-controls="pills-ref" aria-selected="false">Reflexão</a>
                         </li>
                       </ul>
                       <div class="tab-content" id="pills-tabContent">
-                        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">1</div>
-                        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">2</div>
-                        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">3</div>
+                        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                          <div class="div-body">
+                            <h6 class="">Tx</h6>
+                            <input id="tX">
+                            <h6 class="">Ty</h6>
+                            <input id="tY">
+                            <button onClick="translate()">Aplicar</button>
+                          </div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                          <div class="div-body">
+                            <h6 class="">Ângulo(em °)</h6>
+                            <input id="teta">
+                            <button onClick="rotate()">Aplicar</button>
+                          </div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                          <div class="div-body">
+                            <h6 class="">Sx</h6>
+                            <input id="sX">
+                            <h6 class="">Sy</h6>
+                            <input id="sY">
+                            <button onClick="scale()">Aplicar</button>
+                          </div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-ref" role="tabpanel" aria-labelledby="pills-ref-tab">
+                          <div id="div-body-reflection" class="div-body">
+                            <button onClick="reflectX()">Refletir em X</button>
+                            <button onClick="reflectY()">Refletir em Y</button>
+                            <button onClick="reflectXY()">Refletir em XY</button>
+                          </div>
+                        </div>
                       </div>
                 </div>
             </div>
+            <button class="btn btn-primary" type="button" onClick="clearCanvas()">Limpar tudo</button>
+
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
