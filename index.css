@@ -31,7 +31,7 @@ body {
 
 
 #div-transformar {
-    height: 20rem;
+    height: 18rem;
 }
 
 .div-body {
@@ -50,4 +50,8 @@ body {
 
 #div-body-reflection > button {
     margin-bottom: 0.3rem;
+}
+
+#div-recortar {
+    margin-bottom: 2rem
 }

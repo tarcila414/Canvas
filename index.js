@@ -242,22 +242,23 @@ function translate() {
     var tX = document.getElementById("tX").value
     var tY = document.getElementById("tY").value
     
-    linesList.forEach((line, i) => {
+    var newLinesList = linesList.map((line, i) => {
         var newLineCoordP1 = translatePoint(tX, tY, line.x1, line.y1)
         var newLineCoordP2 = translatePoint(tX, tY, line.x2, line.y2)
         clearPxFlag = true
         BresenhamLine(line.x1,line.y1, line.x2, line.y2)
         clearPxFlag = false
         BresenhamLine(newLineCoordP1.x, newLineCoordP1.y, newLineCoordP2.x, newLineCoordP2.y)
-        linesList[i] = { 
+        return { 
             x1: newLineCoordP1.x, 
             y1: newLineCoordP1.y, 
             x2: newLineCoordP2.x, 
             y2: newLineCoordP2.y
         }
     })
+    linesList = newLinesList
 
-    polygonsList.forEach((polygon, i) => {
+    var newPolygonsList = polygonsList.map((polygon, i) => {
         points = []
         polygon.vertices.forEach((point) => {
             points.push(translatePoint(tX, tY, point.x, point.y))
@@ -266,10 +267,11 @@ function translate() {
         drawPolygon(polygon.vertices)
         clearPxFlag = false
         drawPolygon(points)
-        polygonsList[i] = { vertices: points}
+        return { vertices: points}
     })
-    
-    circumferencesList.forEach((circ, i) => {
+    polygonsList = newPolygonsList
+
+    var newCircList = circumferencesList.map((circ, i) => {
         var newCircCoordP1 = translatePoint(tX, tY, circ.x1, circ.y1)
         var newCircCoordP2 = translatePoint(tX, tY, circ.x2, circ.y2)
 
@@ -284,13 +286,14 @@ function translate() {
             y2: newCircCoordP2.y 
         })
 
-        circumferencesList[i] = {
+        return {
             x1: newCircCoordP1.x, 
             y1: newCircCoordP1.y, 
             x2: newCircCoordP2.x, 
             y2: newCircCoordP2.y 
         }
     })
+    circumferencesList = newCircList
 }
 
 
@@ -317,7 +320,7 @@ function rotate() {
     }
     var teta = document.getElementById("teta").value
 
-    linesList.forEach((line, i) => {
+    var newLinesList = linesList.map((line, i) => {
         var tPoint = translatePoint(-line.x1, -line.y1, line.x2, line.y2)
         var rPoint = rotatePoint(teta, tPoint.x, tPoint.y)
         var tPoint2 = translatePoint(line.x1, line.y1, rPoint.x, rPoint.y) 
@@ -325,15 +328,16 @@ function rotate() {
         BresenhamLine(line.x1, line.y1, line.x2, line.y2)
         clearPxFlag = false
         BresenhamLine(line.x1, line.y1, tPoint2.x, tPoint2.y)
-        linesList[i] = {
+        return {
             x1: line.x1, 
             y1: line.y1, 
             x2: tPoint2.x, 
             y2: tPoint2.y
         }
     })
+    linesList = newLinesList
 
-    polygonsList.forEach((polygon,i) => {
+    var newPolygonsList = polygonsList.map((polygon,i) => {
         points = []
         polygon.vertices.forEach((point,j) => {
             if(j === 0) {
@@ -350,8 +354,9 @@ function rotate() {
         drawPolygon(polygon.vertices)
         clearPxFlag = false
         drawPolygon(points)
-        polygonsList[i] = {vertices: points}
+        return {vertices: points}
     })
+    polygonsList = newPolygonsList
 }
 
 function rotatePoint(teta, x, y) {
@@ -394,7 +399,8 @@ function scale() {
         }
     })
 
-    polygonsList.forEach((polygon,i) => {
+    var newPolygonsList = polygonsList.map((polygon,i) => {
+        points = []
         polygon.vertices.forEach((point,j) => {
             if(j === 0) {
                 points.push(point)
@@ -410,10 +416,12 @@ function scale() {
         drawPolygon(polygon.vertices)
         clearPxFlag = false
         drawPolygon(points)
-        polygonsList[i] = {vertices: points}
+        return {vertices: points}
     })
 
-    circumferencesList.forEach((circ, i) => {
+    polygonsList = newPolygonsList
+
+    var newCircList = circumferencesList.map((circ, i) => {
         var tPoint = translatePoint(-circ.x1, -circ.y1, circ.x2, circ.y2)
         var sPoint = scalePoint(sX, sY, tPoint.x, tPoint.y)
         var tPoint2 = translatePoint(circ.x1, circ.y1, sPoint.x, sPoint.y) 
@@ -427,7 +435,15 @@ function scale() {
             x2: tPoint2.x, 
             y2: tPoint2.y 
         })
+
+        return {
+            x1: circ.x1, 
+            y1: circ.y1, 
+            x2: tPoint2.x, 
+            y2: tPoint2.y 
+        }
     })
+    circumferencesList = newCircList
 }
 
 function scalePoint(sx,sy,x, y) {
@@ -451,7 +467,7 @@ function reflectX () {
         alert("Não há objetos desenhados!")
     }
 
-    linesList.forEach((line,i) => {
+    var newLinesList = linesList.map((line) => {
         var tPoint = translatePoint(-line.x1, -line.y1, line.x2, line.y2)
         var sPoint = reflectPoint('X', tPoint.x, tPoint.y)
         var tPoint2 = translatePoint(line.x1, line.y1, sPoint.x, sPoint.y) 
@@ -459,16 +475,17 @@ function reflectX () {
         BresenhamLine(line.x1, line.y1, line.x2, line.y2)
         clearPxFlag = false
         BresenhamLine(line.x1, line.y1, tPoint2.x, tPoint2.y)
-        linesList[i] = {
+        return {
             x1: line.x1, 
             y1: line.y1, 
             x2: tPoint2.x, 
             y2: tPoint2.y
         }
     })
+    linesList = newLinesList
 
 
-    var newPolygonList = polygonsList.map((polygon,i) => {
+    var newPolygonList = polygonsList.map((polygon) => {
         points = []
         polygon.vertices.forEach((point,j) => {
             if(j === 0) {
@@ -487,8 +504,8 @@ function reflectX () {
         drawPolygon(points)
         return {vertices: points}
     })
+    polygonsList = newPolygonList
 
-    console.log(newPolygonList)
 }
 
 function reflectY () {
@@ -498,7 +515,7 @@ function reflectY () {
         alert("Não há objetos desenhados!")
     }
 
-    linesList.forEach((line,i) => {
+    var newLinesList = linesList.map((line) => {
         var tPoint = translatePoint(-line.x1, -line.y1, line.x2, line.y2)
         var sPoint = reflectPoint('Y', tPoint.x, tPoint.y)
         var tPoint2 = translatePoint(line.x1, line.y1, sPoint.x, sPoint.y) 
@@ -506,17 +523,19 @@ function reflectY () {
         BresenhamLine(line.x1, line.y1, line.x2, line.y2)
         clearPxFlag = false
         BresenhamLine(line.x1, line.y1, tPoint2.x, tPoint2.y)
-        linesList[i] = {
+        return {
             x1: line.x1, 
             y1: line.y1, 
             x2: tPoint2.x, 
             y2: tPoint2.y
         }
     })
+    linesList = newLinesList
 
 
-    var newPolygonsList = polygonsList.map((polygon,i) => {
-        polygon.vertices.map((point,j) => {
+    var newPolygonsList = polygonsList.map((polygon) => {
+        points = []
+        polygon.vertices.forEach((point,j) => {
             if(j === 0) {
                 points.push(point)
             } else {
@@ -533,11 +552,7 @@ function reflectY () {
         drawPolygon(points)
         return {vertices: points}
     })
-    console.log("Y N",newPolygonList)
-    
-    copy(polygonsList, newPolygonsList)
-    console.log("Y P",polygonsList)
-
+    polygonsList = newPolygonsList
 }
 
 function reflectXY () {
@@ -547,7 +562,7 @@ function reflectXY () {
         alert("Não há objetos desenhados!")
     }
 
-    linesList.forEach((line,i) => {
+    var newLinesList = linesList.map((line) => {
         var tPoint = translatePoint(-line.x1, -line.y1, line.x2, line.y2)
         var sPoint = reflectPoint('XY', tPoint.x, tPoint.y)
         var tPoint2 = translatePoint(line.x1, line.y1, sPoint.x, sPoint.y) 
@@ -555,15 +570,16 @@ function reflectXY () {
         BresenhamLine(line.x1, line.y1, line.x2, line.y2)
         clearPxFlag = false
         BresenhamLine(line.x1, line.y1, tPoint2.x, tPoint2.y)
-        linesList[i] = {
+        return {
             x1: line.x1, 
             y1: line.y1, 
             x2: tPoint2.x, 
             y2: tPoint2.y
         }
     })
+    linesList = newLinesList
 
-    polygonsList.forEach((polygon,i) => {
+    var newPolygonsList = polygonsList.map((polygon) => {
         points = []
         polygon.vertices.forEach((point,j) => {
             if(j === 0) {
@@ -580,9 +596,9 @@ function reflectXY () {
         drawPolygon(polygon.vertices)
         clearPxFlag = false
         drawPolygon(points)
-        polygonsList[i] = {vertices: points}
+        return {vertices: points}
     })
-
+    polygonsList = newPolygonsList
 }
 
 function reflectPoint (eixo, x, y) {
@@ -607,11 +623,85 @@ function reflectPoint (eixo, x, y) {
 }
 
 /** Algoritmos de recorte  -----------------------------------------------------------------------*/
-function CohenSutherland (x1, y1, x2, y2) {
+function submitPointsRec () {
+    if( points.length < 4) {
+        points.length === 0 ? 
+            alert("Selecione a opção 'Escolher limites' e click em 3 pontos no canvas")
+            : alert("Selecione 3 pontos")  
+    } else {
+        recCohen(points)
+        points = []
+    }
 
 }
 
-function RegionCode(x,y, xmin, ymin, xmax, ymax) {
+function recCohen (limites) {
+    if (linesList.length === 0 
+        && polygonsList.length === 0
+        && circumferencesList.length === 0
+    ) {
+        alert("Não há objetos desenhados!")
+    } else {
+        
+
+        linesList.forEach((line,i) => {
+            CohenSutherland(line.x1, line.y1, line.x2, line.y2, )
+
+            var tPoint = translatePoint(-line.x1, -line.y1, line.x2, line.y2)
+            var sPoint = scalePoint(sX, sY, tPoint.x, tPoint.y)
+            var tPoint2 = translatePoint(line.x1, line.y1, sPoint.x, sPoint.y) 
+            clearPxFlag = true
+            BresenhamLine(line.x1, line.y1, line.x2, line.y2)
+            clearPxFlag = false
+            BresenhamLine(line.x1, line.y1, tPoint2.x, tPoint2.y)
+            linesList[i] = {
+                x1: line.x1, 
+                y1: line.y1, 
+                x2: tPoint2.x, 
+                y2: tPoint2.y
+            }
+        })
+
+    }   
+}
+
+function CohenSutherland (x1, y1, x2, y2, xmin, ymin, xmax, ymax) {
+    var aceite = false
+    var feito = false
+    var cFora = 0
+
+    while(!feito) {
+        var c1 = regionCode(x1,y1, xmin, ymin, xmax, ymax)
+        var c2 = regionCode(x2,y2, xmin, ymin, xmax, ymax)
+
+        if(c1 === 0 && c2 === 0){
+            feito = true
+            aceite = true
+        } else if(c1 & c2) {
+            feito = true
+        } else {
+            if(c1 !== 0) {
+                cFora = c1
+            } else {
+                cFora = c2
+            }
+
+            if((cFora & (1 << 0)) === 1) {
+                console.log("entrou")
+            } else if((cFora & (1 << 1)) === 1) {
+                console.log("entrou2")
+            } else if((cFora & (1 << 2)) === 1) {
+                console.log("entrou3")
+
+            } else if((cFora & (1 << 3)) === 1) {
+                console.log("entrou4")
+
+            }
+        }
+    }
+}
+
+function regionCode(x,y, xmin, ymin, xmax, ymax) {
     var codigo = 0
 
     if(x < xmin) {
