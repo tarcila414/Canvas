@@ -93,11 +93,29 @@
                       </div>
                 </div>
             </div>
-            <!-- <div id="div-recortar">
-              <h3>Transformar</h3>
-              <button class="btn btn-primary" type="button" onClick="clearCanvas()">Coher</button>
-              <button class="btn btn-primary" type="button" onClick="clearCanvas()">Liang</button>
-            </div> -->
+            <div id="div-recortar">
+              <h3>Recortar</h3>
+              <div id="buttons">
+                <div class="dropdown" id="margin-1">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    COHEN
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" onclick="setActionFlag('recCohen')">Escolher limites</a>
+                    <a class="dropdown-item" onclick="submitPointsRec()">Recortar</a>
+                  </div>
+                </div>
+                <div class="dropdown">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Liang
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" onclick="setActionFlag('recLiang')">Escolher limites</a>
+                    <a class="dropdown-item" onclick="submitPointsRec()">Recortar</a>
+                  </div>
+                </div>
+              </div>
+            </div>
             <button class="btn btn-primary" type="button" onClick="clearCanvas()">Limpar tudo</button>
 
         </div>

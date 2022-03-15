@@ -53,5 +53,13 @@ body {
 }
 
 #div-recortar {
-    margin-bottom: 2rem
+    margin-bottom: 2rem;
+}
+
+#div-recortar > #buttons {
+    display: flex;
+}
+
+#div-recortar > #buttons > #margin-1 {
+    margin-right: 1rem;
 }

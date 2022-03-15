@@ -81,7 +81,7 @@ function submitVertices() {
 
 /** Manipulacao do Pixel*/
 function clearPx (x,y) {
-    context.clearRect(x, y, pxSize, pxSize)
+    context.clearRect(x, y, pxSize+1, pxSize+1)
 }
 
 function drawPx (x,y) {
@@ -624,13 +624,20 @@ function reflectPoint (eixo, x, y) {
 
 /** Algoritmos de recorte  -----------------------------------------------------------------------*/
 function submitPointsRec () {
-    if( points.length < 4) {
+    if( points.length < 2) {
         points.length === 0 ? 
-            alert("Selecione a opção 'Escolher limites' e click em 3 pontos no canvas")
-            : alert("Selecione 3 pontos")  
+            alert("Selecione a opção 'Escolher limites' e click em 2 pontos no canvas")
+            : alert("Selecione 2 pontos")  
     } else {
-        recCohen(points)
-        points = []
+        if(actionFlag === "recCohen"){
+            recCohen(points)
+            clearPx(points[0])
+            clearPx(points[1])
+        } else if( actionFlag === "recLiang") {
+            recLiang(points)
+            clearPx(points[0])
+            clearPx(points[1])
+        }
     }
 
 }
@@ -642,25 +649,33 @@ function recCohen (limites) {
     ) {
         alert("Não há objetos desenhados!")
     } else {
+        var xmin = 0
+        var xmax = 0
+        var ymin = 0 
+        var ymax = 0
         
+        if(limites[0].x < limites[1].x) {
+            xmin = limites[0].x
+            xmax = limites[1].x
+        } else {
+            xmin = limites[1].x
+            xmax = limites[0].x
+        }
+
+        if(limites[0].y < limites[1].y) {
+            ymin = limites[0].y
+            ymax = limites[1].y
+        } else {
+            ymin = limites[1].y
+            ymax = limites[0].y
+        }
 
         linesList.forEach((line,i) => {
-            CohenSutherland(line.x1, line.y1, line.x2, line.y2, )
-
-            var tPoint = translatePoint(-line.x1, -line.y1, line.x2, line.y2)
-            var sPoint = scalePoint(sX, sY, tPoint.x, tPoint.y)
-            var tPoint2 = translatePoint(line.x1, line.y1, sPoint.x, sPoint.y) 
             clearPxFlag = true
             BresenhamLine(line.x1, line.y1, line.x2, line.y2)
-            clearPxFlag = false
-            BresenhamLine(line.x1, line.y1, tPoint2.x, tPoint2.y)
-            linesList[i] = {
-                x1: line.x1, 
-                y1: line.y1, 
-                x2: tPoint2.x, 
-                y2: tPoint2.y
-            }
-        })
+            
+            CohenSutherland(line.x1, line.y1, line.x2, line.y2, xmin, ymin, xmax, ymax)
+         })
 
     }   
 }
@@ -669,11 +684,13 @@ function CohenSutherland (x1, y1, x2, y2, xmin, ymin, xmax, ymax) {
     var aceite = false
     var feito = false
     var cFora = 0
+    var xint = 0
+    var yint = 0
+
+    var c1 = regionCode((x1),(y1), xmin, ymin, xmax, ymax)
+    var c2 = regionCode((x2),(y2), xmin, ymin, xmax, ymax)
 
     while(!feito) {
-        var c1 = regionCode(x1,y1, xmin, ymin, xmax, ymax)
-        var c2 = regionCode(x2,y2, xmin, ymin, xmax, ymax)
-
         if(c1 === 0 && c2 === 0){
             feito = true
             aceite = true
@@ -685,19 +702,38 @@ function CohenSutherland (x1, y1, x2, y2, xmin, ymin, xmax, ymax) {
             } else {
                 cFora = c2
             }
+            if(cFora & 1) {
+                xint = xmin 
+                yint = y1+(y2-y1)*((xmin - x1) / (x2-x1))
+            } else if(cFora & 2) {
+                xint = xmax 
+                yint = y1+(y2-y1)*((xmax - x1) / (x2-x1))
+            } else if(cFora & 4) {
+                yint = ymin 
+                xint = x1+(x2-x1)*((ymin - y1) / (y2-y1))
 
-            if((cFora & (1 << 0)) === 1) {
-                console.log("entrou")
-            } else if((cFora & (1 << 1)) === 1) {
-                console.log("entrou2")
-            } else if((cFora & (1 << 2)) === 1) {
-                console.log("entrou3")
-
-            } else if((cFora & (1 << 3)) === 1) {
-                console.log("entrou4")
-
+            } else if(cFora & 8) {
+                yint = ymax 
+                xint = x1+(x2-x1)*((ymax - y1) / (y2-y1))
             }
+
+            if(c1 === cFora) {
+                x1 = xint
+                y1 = yint
+
+                c1 = regionCode((x1),(y1), xmin, ymin, xmax, ymax)
+            } else {
+                x2 = xint
+                y2 = yint
+
+                c2 = regionCode((x2),(y2), xmin, ymin, xmax, ymax)
+            }
+
         }
+    }
+    if(aceite) {
+        clearPxFlag = false
+        BresenhamLine(Math.round(x1), Math.round(y1), Math.round(x2), Math.round(y2))
     }
 }
 
@@ -721,4 +757,90 @@ function regionCode(x,y, xmin, ymin, xmax, ymax) {
     }
 
     return codigo
+}
+
+function recLiang (limites) {
+    if (linesList.length === 0 
+        && polygonsList.length === 0
+        && circumferencesList.length === 0
+    ) {
+        alert("Não há objetos desenhados!")
+    } else {
+        var xmin = 0
+        var xmax = 0
+        var ymin = 0 
+        var ymax = 0
+        
+        if(limites[0].x < limites[1].x) {
+            xmin = limites[0].x
+            xmax = limites[1].x
+        } else {
+            xmin = limites[1].x
+            xmax = limites[0].x
+        }
+
+        if(limites[0].y < limites[1].y) {
+            ymin = limites[0].y
+            ymax = limites[1].y
+        } else {
+            ymin = limites[1].y
+            ymax = limites[0].y
+        }
+
+        linesList.forEach((line,i) => {
+            clearPxFlag = true
+            BresenhamLine(line.x1, line.y1, line.x2, line.y2)
+            
+            Liang(line.x1, line.y1, line.x2, line.y2, xmin, ymin, xmax, ymax)
+         })
+
+    }   
+}
+
+var u1Obj = { u1: 0.0}
+var u2Obj = { u2: 0.0 }
+
+function Liang (x1,y1,x2,y2, xmin, ymin, xmax, ymax) {
+    u1Obj.u1 = 0.0
+    u2Obj.u2 = 1.0
+    var dx = x2 - x1
+    var dy = y2 - y1
+
+    if(clipTest(-dx, x1-xmin, u1Obj,u2Obj)) {
+        if(clipTest(dx, xmax -x1, u1Obj,u2Obj)) {
+            if(clipTest(-dy, y1-ymin, u1Obj,u2Obj)) {
+                if(clipTest(dy, ymax - y1, u1Obj,u2Obj)) {
+                    if(u2Obj.u2 < 1) {
+                        x2 = x1 + u2Obj.u2*dx
+                        y2 = y1 + u2Obj.u2*dy
+                    }
+                    if(u1Obj.u1 > 0) {
+                        x1 = x1 + u1Obj.u1*dx
+                        y1 = y1 + u1Obj.u1*dy
+                    }
+                    clearPxFlag = false
+                    BresenhamLine(x1, y1, x2, y2)
+                }
+            }
+        }
+    }
+}
+
+function clipTest(p,q,u1Obj,u2Obj) {
+    var result = true
+    var r = 0.0
+
+    if(p < 0.0) {
+       r = q/p
+       if(r> u2Obj.u2) { result = false } 
+       else if (r>u1Obj.u1) {u1Obj.u1 = r}
+    } else if(p>0.0) {
+        r = q/p
+        if(r< u1Obj.u1){ result = false}
+        else if(r < u2Obj.u2) {u2Obj.u2 = r}
+    } else if( q<0.0) {
+        result = false
+    }
+    console.log(u1Obj.u1,u2Obj.u2)
+    return result
 }
